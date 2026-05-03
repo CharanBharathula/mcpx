@@ -3,7 +3,7 @@
   "servers": [
     {
       "name": "github",
-      "description": "GitHub API integration — manage repos, issues, PRs, files, and more",
+      "description": "GitHub API integration - manage repos, issues, PRs, files, and more",
       "package": "@modelcontextprotocol/server-github",
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
@@ -14,6 +14,7 @@
           "required": true
         }
       ],
+      "arg_prompts": [],
       "tags": ["github", "git", "vcs", "code", "api"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/github"
     },
@@ -22,8 +23,16 @@
       "description": "Secure file system access with configurable allowed directories",
       "package": "@modelcontextprotocol/server-filesystem",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "{allowed_dir}"],
       "env": [],
+      "arg_prompts": [
+        {
+          "name": "allowed_dir",
+          "description": "Directory path to allow filesystem access (e.g. C:\\Users\\you\\Documents or /home/user)",
+          "placeholder": "{allowed_dir}",
+          "required": true
+        }
+      ],
       "tags": ["filesystem", "files", "local"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem"
     },
@@ -34,6 +43,7 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-fetch"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["web", "fetch", "http", "browser"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch"
     },
@@ -44,6 +54,7 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-memory"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["memory", "knowledge-graph", "persistence"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory"
     },
@@ -52,11 +63,13 @@
       "description": "PostgreSQL database integration with read-only query support",
       "package": "@modelcontextprotocol/server-postgres",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": [
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "{connection_string}"],
+      "env": [],
+      "arg_prompts": [
         {
-          "name": "POSTGRES_CONNECTION_STRING",
-          "description": "PostgreSQL connection string (e.g. postgresql://user:pass@localhost/db)",
+          "name": "connection_string",
+          "description": "PostgreSQL connection string (e.g. postgresql://user:pass@localhost/mydb)",
+          "placeholder": "{connection_string}",
           "required": true
         }
       ],
@@ -68,8 +81,16 @@
       "description": "SQLite database integration for local data storage and analysis",
       "package": "@modelcontextprotocol/server-sqlite",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite"],
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "{db_path}"],
       "env": [],
+      "arg_prompts": [
+        {
+          "name": "db_path",
+          "description": "Path to SQLite database file (e.g. C:\\Users\\you\\data.db or /home/user/data.db)",
+          "placeholder": "{db_path}",
+          "required": true
+        }
+      ],
       "tags": ["database", "sqlite", "sql", "local"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite"
     },
@@ -86,6 +107,7 @@
           "required": true
         }
       ],
+      "arg_prompts": [],
       "tags": ["search", "web", "brave", "api"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search"
     },
@@ -96,6 +118,7 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["browser", "puppeteer", "automation", "scraping"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer"
     },
@@ -117,16 +140,18 @@
           "required": false
         }
       ],
+      "arg_prompts": [],
       "tags": ["slack", "messaging", "communication", "api"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/slack"
     },
     {
       "name": "git",
-      "description": "Git repository operations — read history, diffs, branches, and more",
+      "description": "Git repository operations - read history, diffs, branches, and more",
       "package": "mcp-server-git",
       "command": "uvx",
       "args": ["mcp-server-git"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["git", "vcs", "version-control", "repository"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/git"
     },
@@ -137,6 +162,7 @@
       "command": "uvx",
       "args": ["mcp-server-time"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["time", "timezone", "date", "utilities"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/time"
     },
@@ -147,6 +173,7 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["thinking", "reasoning", "problem-solving", "cognitive"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking"
     },
@@ -163,6 +190,7 @@
           "required": true
         }
       ],
+      "arg_prompts": [],
       "tags": ["maps", "location", "google", "geocoding", "directions"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps"
     },
@@ -184,6 +212,7 @@
           "required": false
         }
       ],
+      "arg_prompts": [],
       "tags": ["gitlab", "git", "vcs", "ci-cd", "api"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/gitlab"
     },
@@ -194,6 +223,7 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-everything"],
       "env": [],
+      "arg_prompts": [],
       "tags": ["testing", "reference", "demo", "development"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/everything"
     }

@@ -11,6 +11,12 @@ from .config import ConfigManager
 from .installer import Installer
 from .registry import Registry
 
+_RUNTIME_INSTALL_HINTS = {
+    "npx": "Node.js not found. Install from https://nodejs.org",
+    "node": "Node.js not found. Install from https://nodejs.org",
+    "uvx": "uv not found. Install from https://docs.astral.sh/uv/",
+}
+
 
 def _console() -> Console:
     """Return a Console writing to current sys.stdout (CliRunner-compatible)."""
@@ -22,7 +28,7 @@ def _console() -> Console:
 @click.version_option(version="0.1.0", prog_name="mcpx")
 @click.pass_context
 def main(ctx: click.Context, dry_run: bool) -> None:
-    """mcpx — A package manager for MCP servers.
+    """mcpx - A package manager for MCP servers.
 
     Install, configure, and manage MCP servers across Claude Desktop,
     Cursor, and Windsurf with a single command.
@@ -67,6 +73,7 @@ def install(ctx: click.Context, server_name: str, clients: tuple) -> None:
         )
     )
 
+    # --- Collect environment variable values ---
     env_values: dict = {}
     for env_var in server.get("env", []):
         if not env_var.get("required"):
@@ -78,11 +85,27 @@ def install(ctx: click.Context, server_name: str, clients: tuple) -> None:
                 kw in env_var["name"]
                 for kw in ("TOKEN", "KEY", "SECRET", "PASSWORD", "PASS")
             )
+            suffix = " (characters hidden)" if hide else ""
             value = click.prompt(
-                f"Enter {env_var['description']} ({env_var['name']})",
+                f"  {env_var['name']}{suffix}",
                 hide_input=hide,
+                prompt_suffix=": ",
             )
             env_values[env_var["name"]] = value
+
+    # --- Collect arg-level values (e.g. directory paths) ---
+    arg_values: dict = {}
+    for ap in server.get("arg_prompts", []):
+        if not ap.get("required"):
+            continue
+        if dry_run:
+            console.print(
+                f"[yellow][dry-run][/yellow] Would prompt for: {ap['name']} ({ap['description']})"
+            )
+        else:
+            value = click.prompt(f"  {ap['description']}", prompt_suffix=": ")
+            key = ap["placeholder"].strip("{}")
+            arg_values[key] = value
 
     config_manager = ConfigManager()
     all_clients = config_manager.get_client_configs()
@@ -92,7 +115,8 @@ def install(ctx: click.Context, server_name: str, clients: tuple) -> None:
 
     if dry_run:
         console.print(
-            f"\n[yellow][dry-run][/yellow] Would install npm package: [bold]{server['package']}[/bold]"
+            f"\n[yellow][dry-run][/yellow] Would install: [bold]{server['package']}[/bold]"
+            f" (via {server['command']}, auto-downloaded on first use)"
         )
         for client_name in target_clients:
             if client_name in all_clients:
@@ -103,12 +127,19 @@ def install(ctx: click.Context, server_name: str, clients: tuple) -> None:
                 )
         return
 
-    success = installer.install_package(server["package"])
+    # --- Verify the runtime is available ---
+    success = installer.install_package(server["package"], command=server["command"])
     if not success:
-        console.print(f"[red]Failed to install npm package {server['package']}[/red]")
+        cmd = server["command"]
+        hint = _RUNTIME_INSTALL_HINTS.get(cmd, f"'{cmd}' not found in PATH.")
+        console.print(f"[red]Error:[/red] {hint}")
         sys.exit(1)
 
-    server_config = installer.build_server_config(server, env_values or None)
+    server_config = installer.build_server_config(
+        server,
+        env_values=env_values or None,
+        arg_values=arg_values or None,
+    )
     written_to = []
     for client_name in target_clients:
         if client_name in all_clients:
@@ -116,10 +147,13 @@ def install(ctx: click.Context, server_name: str, clients: tuple) -> None:
             config_manager.add_server(config_path, server["name"], server_config)
             written_to.append(all_clients[client_name]["name"])
 
-    console.print(f"\n[green]✓[/green] Installed [bold]{server['name']}[/bold]")
+    console.print(f"\n[green]✓[/green] Configured [bold]{server['name']}[/bold]")
     if written_to:
-        console.print(f"  Configured for: {', '.join(written_to)}")
-    console.print("\n[dim]Restart your client(s) to activate the server.[/dim]")
+        console.print(f"  Written to: {', '.join(written_to)}")
+    console.print(
+        "\n[dim]The server package is downloaded automatically on first use.[/dim]"
+        "\n[dim]Restart your client(s) to activate the server.[/dim]"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -188,13 +222,18 @@ def info(server_name: str) -> None:
         console.print(f"[bold]Tags:[/bold]     {', '.join(server['tags'])}")
 
     env_vars = server.get("env", [])
-    if env_vars:
-        console.print("\n[bold]Environment Variables:[/bold]")
+    arg_prompts = server.get("arg_prompts", [])
+
+    if env_vars or arg_prompts:
+        console.print("\n[bold]Required inputs:[/bold]")
         for ev in env_vars:
             req = "[red]required[/red]" if ev.get("required") else "[dim]optional[/dim]"
-            console.print(f"  • {ev['name']} ({req}) — {ev['description']}")
+            console.print(f"  • {ev['name']} ({req}) - {ev['description']}")
+        for ap in arg_prompts:
+            req = "[red]required[/red]" if ap.get("required") else "[dim]optional[/dim]"
+            console.print(f"  • {ap['name']} ({req}) - {ap['description']}")
     else:
-        console.print("\n[dim]No environment variables required.[/dim]")
+        console.print("\n[dim]No inputs required.[/dim]")
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +266,7 @@ def list_servers(client: str) -> None:
         return
 
     table = Table(
-        title=f"Installed Servers — {client_configs[client]['name']}",
+        title=f"Installed Servers - {client_configs[client]['name']}",
         show_header=True,
         header_style="bold blue",
     )
@@ -366,10 +405,9 @@ def run(server_name: str, client: str) -> None:
     except KeyboardInterrupt:
         console.print("\n[dim]Server stopped.[/dim]")
     except FileNotFoundError:
-        console.print(
-            f"[red]Error:[/red] Command '{server['command']}' not found. "
-            "Is Node.js installed?"
-        )
+        cmd_name = server["command"]
+        hint = _RUNTIME_INSTALL_HINTS.get(cmd_name, f"'{cmd_name}' not found in PATH.")
+        console.print(f"[red]Error:[/red] {hint}")
         sys.exit(1)
 
 
@@ -415,22 +453,35 @@ def update(ctx: click.Context, server_name: str | None, client: str) -> None:
     for name in servers_to_update:
         server_def = registry.get_server(name)
         if not server_def:
-            console.print(f"[dim]Skipping '{name}' — not in registry.[/dim]")
+            console.print(f"[dim]Skipping '{name}' - not in registry.[/dim]")
             continue
 
+        cmd = server_def["command"]
         package = server_def["package"]
-        if dry_run:
-            console.print(
-                f"[yellow][dry-run][/yellow] Would update: [bold]{package}[/bold]"
-            )
-        else:
-            console.print(f"Updating [bold]{package}[/bold]...")
-            result = subprocess.run(
-                ["npm", "install", "-g", f"{package}@latest"],
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode == 0:
-                console.print(f"[green]✓[/green] Updated {name}")
+
+        if cmd == "uvx":
+            if dry_run:
+                console.print(
+                    f"[yellow][dry-run][/yellow] Would update: [bold]{package}[/bold] via uvx"
+                )
             else:
-                console.print(f"[red]Failed to update {name}:[/red] {result.stderr}")
+                console.print(f"Updating [bold]{package}[/bold] via uvx...")
+                result = subprocess.run(
+                    ["uvx", "--reinstall", package],
+                    capture_output=True,
+                    text=True,
+                )
+                if result.returncode == 0:
+                    console.print(f"[green]✓[/green] Updated {name}")
+                else:
+                    console.print(f"[red]Failed to update {name}:[/red] {result.stderr}")
+        else:
+            # npx-based servers download the latest version automatically on each run
+            if dry_run:
+                console.print(
+                    f"[yellow][dry-run][/yellow] Would update: [bold]{package}[/bold] via npx"
+                )
+            else:
+                console.print(
+                    f"[green]✓[/green] {name} uses npx - latest version is fetched automatically on each run."
+                )
