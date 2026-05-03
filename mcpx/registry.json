@@ -103,7 +103,7 @@
       "env": [
         {
           "name": "BRAVE_API_KEY",
-          "description": "Brave Search API key",
+          "description": "Brave Search API key (brave.com/search/api)",
           "required": true
         }
       ],
@@ -131,7 +131,7 @@
       "env": [
         {
           "name": "SLACK_BOT_TOKEN",
-          "description": "Slack Bot User OAuth Token",
+          "description": "Slack Bot User OAuth Token (xoxb-...)",
           "required": true
         },
         {
@@ -152,6 +152,7 @@
       "args": ["mcp-server-git"],
       "env": [],
       "arg_prompts": [],
+      "notes": "Requires uv: install from https://docs.astral.sh/uv/",
       "tags": ["git", "vcs", "version-control", "repository"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/git"
     },
@@ -163,6 +164,7 @@
       "args": ["mcp-server-time"],
       "env": [],
       "arg_prompts": [],
+      "notes": "Requires uv: install from https://docs.astral.sh/uv/",
       "tags": ["time", "timezone", "date", "utilities"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/time"
     },
@@ -186,7 +188,7 @@
       "env": [
         {
           "name": "GOOGLE_MAPS_API_KEY",
-          "description": "Google Maps Platform API key",
+          "description": "Google Maps Platform API key (console.cloud.google.com)",
           "required": true
         }
       ],
@@ -226,6 +228,285 @@
       "arg_prompts": [],
       "tags": ["testing", "reference", "demo", "development"],
       "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/everything"
+    },
+    {
+      "name": "playwright",
+      "description": "Browser automation with Playwright - navigate, screenshot, fill forms, click elements",
+      "package": "@playwright/mcp",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"],
+      "env": [],
+      "arg_prompts": [],
+      "tags": ["browser", "playwright", "automation", "testing", "scraping"],
+      "homepage": "https://github.com/microsoft/playwright-mcp"
+    },
+    {
+      "name": "sentry",
+      "description": "Sentry error tracking - inspect issues, events, stack traces, and releases",
+      "package": "@sentry/mcp-server",
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server", "--access-token", "{access_token}"],
+      "env": [],
+      "arg_prompts": [
+        {
+          "name": "access_token",
+          "description": "Sentry auth token (sentry.io Settings -> API -> Auth Tokens)",
+          "placeholder": "{access_token}",
+          "required": true
+        }
+      ],
+      "tags": ["sentry", "errors", "monitoring", "debugging", "observability"],
+      "homepage": "https://github.com/getsentry/sentry-mcp"
+    },
+    {
+      "name": "kubernetes",
+      "description": "Kubernetes cluster management - pods, deployments, services, logs via kubectl",
+      "package": "mcp-server-kubernetes",
+      "command": "npx",
+      "args": ["-y", "mcp-server-kubernetes"],
+      "env": [],
+      "arg_prompts": [],
+      "notes": "Requires kubectl configured with cluster access (run: kubectl cluster-info)",
+      "tags": ["kubernetes", "k8s", "devops", "containers", "cloud"],
+      "homepage": "https://github.com/Flux159/mcp-server-kubernetes"
+    },
+    {
+      "name": "docker",
+      "description": "Docker container management - run commands, manage images, containers, and volumes",
+      "package": "mcp-server-docker",
+      "command": "npx",
+      "args": ["-y", "mcp-server-docker"],
+      "env": [],
+      "arg_prompts": [],
+      "notes": "Requires Docker Desktop or Docker Engine running locally",
+      "tags": ["docker", "containers", "devops", "images", "volumes"],
+      "homepage": "https://github.com/ckreiling/mcp-server-docker"
+    },
+    {
+      "name": "notion",
+      "description": "Notion workspace integration - read and edit pages, databases, and blocks",
+      "package": "@notionhq/notion-mcp-server",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": [
+        {
+          "name": "NOTION_TOKEN",
+          "description": "Notion integration token (notion.so/my-integrations)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["notion", "notes", "knowledge-base", "productivity", "docs"],
+      "homepage": "https://github.com/makenotion/notion-mcp-server"
+    },
+    {
+      "name": "azure",
+      "description": "Azure cloud management - resources, storage, databases, and more via Azure CLI",
+      "package": "@azure/mcp",
+      "command": "npx",
+      "args": ["-y", "@azure/mcp", "server", "start"],
+      "env": [],
+      "arg_prompts": [],
+      "notes": "Requires Azure CLI logged in: run 'az login' before use",
+      "tags": ["azure", "cloud", "microsoft", "devops", "infrastructure"],
+      "homepage": "https://github.com/Azure/azure-mcp"
+    },
+    {
+      "name": "hubspot",
+      "description": "HubSpot CRM integration - contacts, companies, deals, and marketing tools",
+      "package": "@hubspot/mcp-server",
+      "command": "npx",
+      "args": ["-y", "@hubspot/mcp-server", "--stdio"],
+      "env": [
+        {
+          "name": "HUBSPOT_ACCESS_TOKEN",
+          "description": "HubSpot Private App access token (app.hubspot.com/private-apps)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["hubspot", "crm", "marketing", "sales", "contacts"],
+      "homepage": "https://github.com/HubSpot/mcp-server"
+    },
+    {
+      "name": "figma",
+      "description": "Figma design tool integration - read files, components, styles, and variables",
+      "package": "figma-developer-mcp",
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
+      "env": [
+        {
+          "name": "FIGMA_API_KEY",
+          "description": "Figma Personal Access Token (figma.com/settings -> Personal access tokens)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["figma", "design", "ui", "components", "prototyping"],
+      "homepage": "https://github.com/GLips/Figma-Context-MCP"
+    },
+    {
+      "name": "supabase",
+      "description": "Supabase backend integration - database, auth, storage, and edge functions",
+      "package": "@supabase/mcp-server-supabase",
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase", "--access-token", "{access_token}"],
+      "env": [],
+      "arg_prompts": [
+        {
+          "name": "access_token",
+          "description": "Supabase personal access token (supabase.com/dashboard/account/tokens)",
+          "placeholder": "{access_token}",
+          "required": true
+        }
+      ],
+      "tags": ["supabase", "database", "backend", "postgresql", "auth"],
+      "homepage": "https://github.com/supabase-community/supabase-mcp"
+    },
+    {
+      "name": "aws-kb-retrieval",
+      "description": "AWS Knowledge Base retrieval using Bedrock Agent Runtime for RAG workflows",
+      "package": "@modelcontextprotocol/server-aws-kb-retrieval",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-aws-kb-retrieval"],
+      "env": [
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "description": "AWS Access Key ID",
+          "required": true
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "description": "AWS Secret Access Key",
+          "required": true
+        },
+        {
+          "name": "AWS_REGION",
+          "description": "AWS Region (e.g. us-east-1)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["aws", "bedrock", "rag", "knowledge-base", "cloud"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/aws-kb-retrieval-server"
+    },
+    {
+      "name": "cloudflare",
+      "description": "Cloudflare platform management - Workers, KV, D1, R2, and DNS via Cloudflare API",
+      "package": "@cloudflare/mcp-server-cloudflare",
+      "command": "npx",
+      "args": ["-y", "@cloudflare/mcp-server-cloudflare"],
+      "env": [],
+      "arg_prompts": [],
+      "notes": "Requires Wrangler authenticated: run 'npx wrangler login' before use",
+      "tags": ["cloudflare", "workers", "edge", "cdn", "dns", "cloud"],
+      "homepage": "https://github.com/cloudflare/mcp-server-cloudflare"
+    },
+    {
+      "name": "exa",
+      "description": "Exa AI-powered web search and crawling with semantic understanding",
+      "package": "exa-mcp-server",
+      "command": "npx",
+      "args": ["-y", "exa-mcp-server"],
+      "env": [
+        {
+          "name": "EXA_API_KEY",
+          "description": "Exa API key (dashboard.exa.ai)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["search", "web", "exa", "semantic", "crawling"],
+      "homepage": "https://github.com/exa-labs/exa-mcp-server"
+    },
+    {
+      "name": "stripe",
+      "description": "Stripe payments integration - customers, charges, subscriptions, and payouts",
+      "package": "@stripe/mcp",
+      "command": "npx",
+      "args": ["-y", "@stripe/mcp", "--tools=all"],
+      "env": [
+        {
+          "name": "STRIPE_SECRET_KEY",
+          "description": "Stripe secret key (dashboard.stripe.com/apikeys, starts with sk_)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["stripe", "payments", "billing", "subscriptions", "api"],
+      "homepage": "https://github.com/stripe/agent-toolkit"
+    },
+    {
+      "name": "obsidian",
+      "description": "Obsidian vault integration - read, search, and write notes in your vault",
+      "package": "mcp-obsidian",
+      "command": "npx",
+      "args": ["-y", "mcp-obsidian", "{vault_path}"],
+      "env": [],
+      "arg_prompts": [
+        {
+          "name": "vault_path",
+          "description": "Path to your Obsidian vault directory (e.g. C:\\Users\\you\\MyVault or /home/user/vault)",
+          "placeholder": "{vault_path}",
+          "required": true
+        }
+      ],
+      "tags": ["obsidian", "notes", "markdown", "knowledge-base", "pkm"],
+      "homepage": "https://github.com/calclavia/mcp-obsidian"
+    },
+    {
+      "name": "mongodb",
+      "description": "MongoDB database integration - query collections, indexes, and aggregations",
+      "package": "mongodb-mcp-server",
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server"],
+      "env": [
+        {
+          "name": "MDB_MCP_CONNECTION_STRING",
+          "description": "MongoDB connection string (e.g. mongodb://user:pass@localhost:27017/db)",
+          "required": true
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["mongodb", "database", "nosql", "documents"],
+      "homepage": "https://github.com/mongodb-js/mongodb-mcp-server"
+    },
+    {
+      "name": "atlassian",
+      "description": "Atlassian Jira and Confluence integration - issues, sprints, pages, and spaces",
+      "package": "mcp-atlassian",
+      "command": "npx",
+      "args": ["-y", "mcp-atlassian"],
+      "env": [
+        {
+          "name": "CONFLUENCE_URL",
+          "description": "Confluence base URL (e.g. https://yourteam.atlassian.net/wiki)",
+          "required": true
+        },
+        {
+          "name": "CONFLUENCE_USERNAME",
+          "description": "Atlassian account email",
+          "required": true
+        },
+        {
+          "name": "CONFLUENCE_API_TOKEN",
+          "description": "Atlassian API token (id.atlassian.com/manage-profile/security/api-tokens)",
+          "required": true
+        },
+        {
+          "name": "JIRA_URL",
+          "description": "Jira base URL (e.g. https://yourteam.atlassian.net)",
+          "required": false
+        },
+        {
+          "name": "JIRA_API_TOKEN",
+          "description": "Jira API token (same as Confluence token)",
+          "required": false
+        }
+      ],
+      "arg_prompts": [],
+      "tags": ["jira", "confluence", "atlassian", "project-management", "docs"],
+      "homepage": "https://github.com/sooperset/mcp-atlassian"
     }
   ]
 }

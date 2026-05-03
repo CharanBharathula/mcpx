@@ -221,6 +221,9 @@ def info(server_name: str) -> None:
     if server.get("tags"):
         console.print(f"[bold]Tags:[/bold]     {', '.join(server['tags'])}")
 
+    if server.get("notes"):
+        console.print(f"\n[yellow]Note:[/yellow] {server['notes']}")
+
     env_vars = server.get("env", [])
     arg_prompts = server.get("arg_prompts", [])
 

@@ -84,6 +84,46 @@ def test_install_dry_run_sqlite():
     assert "db_path" in result.output.lower()
 
 
+def test_install_dry_run_notion():
+    """--dry-run for notion shows NOTION_TOKEN env prompt."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--dry-run", "install", "notion"])
+    assert result.exit_code == 0
+    assert "NOTION_TOKEN" in result.output
+
+
+def test_install_dry_run_stripe():
+    """--dry-run for stripe shows STRIPE_SECRET_KEY env prompt."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--dry-run", "install", "stripe"])
+    assert result.exit_code == 0
+    assert "STRIPE_SECRET_KEY" in result.output
+
+
+def test_install_dry_run_supabase():
+    """--dry-run for supabase shows access_token arg prompt."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--dry-run", "install", "supabase"])
+    assert result.exit_code == 0
+    assert "access_token" in result.output.lower()
+
+
+def test_install_dry_run_playwright():
+    """--dry-run for playwright (no config needed) shows write config message."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--dry-run", "install", "playwright"])
+    assert result.exit_code == 0
+    assert "would write config" in result.output.lower()
+
+
+def test_info_shows_notes_for_kubernetes():
+    """info command shows notes for servers that need prior setup."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["info", "kubernetes"])
+    assert result.exit_code == 0
+    assert "kubectl" in result.output.lower()
+
+
 def test_uninstall_dry_run():
     runner = CliRunner()
     result = runner.invoke(main, ["--dry-run", "uninstall", "memory"])
@@ -91,7 +131,7 @@ def test_uninstall_dry_run():
     assert "would remove" in result.output.lower()
 
 
-def test_search_returns_all_15_servers():
+def test_search_returns_all_servers():
     runner = CliRunner()
     result = runner.invoke(main, ["search"])
     assert result.exit_code == 0
@@ -99,6 +139,9 @@ def test_search_returns_all_15_servers():
         "github", "filesystem", "fetch", "memory", "postgres", "sqlite",
         "brave-search", "puppeteer", "slack", "git", "time",
         "sequential-thinking", "google-maps", "gitlab", "everything",
+        "playwright", "sentry", "kubernetes", "docker", "notion", "azure",
+        "hubspot", "figma", "supabase", "aws-kb-retrieval", "cloudflare",
+        "exa", "stripe", "obsidian", "mongodb", "atlassian",
     ]:
         assert name in result.output.lower(), f"Expected '{name}' in search output"
 
