@@ -1,0 +1,201 @@
+{
+  "version": "1.0.0",
+  "servers": [
+    {
+      "name": "github",
+      "description": "GitHub API integration — manage repos, issues, PRs, files, and more",
+      "package": "@modelcontextprotocol/server-github",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": [
+        {
+          "name": "GITHUB_PERSONAL_ACCESS_TOKEN",
+          "description": "GitHub Personal Access Token with repo access",
+          "required": true
+        }
+      ],
+      "tags": ["github", "git", "vcs", "code", "api"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/github"
+    },
+    {
+      "name": "filesystem",
+      "description": "Secure file system access with configurable allowed directories",
+      "package": "@modelcontextprotocol/server-filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "env": [],
+      "tags": ["filesystem", "files", "local"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem"
+    },
+    {
+      "name": "fetch",
+      "description": "Web content fetching and conversion for efficient LLM usage",
+      "package": "@modelcontextprotocol/server-fetch",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "env": [],
+      "tags": ["web", "fetch", "http", "browser"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch"
+    },
+    {
+      "name": "memory",
+      "description": "Knowledge graph-based persistent memory for AI conversations",
+      "package": "@modelcontextprotocol/server-memory",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": [],
+      "tags": ["memory", "knowledge-graph", "persistence"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory"
+    },
+    {
+      "name": "postgres",
+      "description": "PostgreSQL database integration with read-only query support",
+      "package": "@modelcontextprotocol/server-postgres",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": [
+        {
+          "name": "POSTGRES_CONNECTION_STRING",
+          "description": "PostgreSQL connection string (e.g. postgresql://user:pass@localhost/db)",
+          "required": true
+        }
+      ],
+      "tags": ["database", "postgres", "sql"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres"
+    },
+    {
+      "name": "sqlite",
+      "description": "SQLite database integration for local data storage and analysis",
+      "package": "@modelcontextprotocol/server-sqlite",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite"],
+      "env": [],
+      "tags": ["database", "sqlite", "sql", "local"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite"
+    },
+    {
+      "name": "brave-search",
+      "description": "Web and local search using the Brave Search API",
+      "package": "@modelcontextprotocol/server-brave-search",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": [
+        {
+          "name": "BRAVE_API_KEY",
+          "description": "Brave Search API key",
+          "required": true
+        }
+      ],
+      "tags": ["search", "web", "brave", "api"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search"
+    },
+    {
+      "name": "puppeteer",
+      "description": "Browser automation and web scraping using Puppeteer",
+      "package": "@modelcontextprotocol/server-puppeteer",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "env": [],
+      "tags": ["browser", "puppeteer", "automation", "scraping"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer"
+    },
+    {
+      "name": "slack",
+      "description": "Slack workspace integration for messaging and channel management",
+      "package": "@modelcontextprotocol/server-slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": [
+        {
+          "name": "SLACK_BOT_TOKEN",
+          "description": "Slack Bot User OAuth Token",
+          "required": true
+        },
+        {
+          "name": "SLACK_TEAM_ID",
+          "description": "Slack Team/Workspace ID",
+          "required": false
+        }
+      ],
+      "tags": ["slack", "messaging", "communication", "api"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/slack"
+    },
+    {
+      "name": "git",
+      "description": "Git repository operations — read history, diffs, branches, and more",
+      "package": "mcp-server-git",
+      "command": "uvx",
+      "args": ["mcp-server-git"],
+      "env": [],
+      "tags": ["git", "vcs", "version-control", "repository"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/git"
+    },
+    {
+      "name": "time",
+      "description": "Time and timezone utilities for date/time queries and conversions",
+      "package": "mcp-server-time",
+      "command": "uvx",
+      "args": ["mcp-server-time"],
+      "env": [],
+      "tags": ["time", "timezone", "date", "utilities"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/time"
+    },
+    {
+      "name": "sequential-thinking",
+      "description": "Dynamic, reflective problem-solving through structured sequential thinking",
+      "package": "@modelcontextprotocol/server-sequential-thinking",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": [],
+      "tags": ["thinking", "reasoning", "problem-solving", "cognitive"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking"
+    },
+    {
+      "name": "google-maps",
+      "description": "Google Maps integration for location search, directions, and geocoding",
+      "package": "@modelcontextprotocol/server-google-maps",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+      "env": [
+        {
+          "name": "GOOGLE_MAPS_API_KEY",
+          "description": "Google Maps Platform API key",
+          "required": true
+        }
+      ],
+      "tags": ["maps", "location", "google", "geocoding", "directions"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps"
+    },
+    {
+      "name": "gitlab",
+      "description": "GitLab API integration for repository management and CI/CD pipelines",
+      "package": "@modelcontextprotocol/server-gitlab",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "env": [
+        {
+          "name": "GITLAB_PERSONAL_ACCESS_TOKEN",
+          "description": "GitLab Personal Access Token",
+          "required": true
+        },
+        {
+          "name": "GITLAB_URL",
+          "description": "GitLab instance URL (default: https://gitlab.com)",
+          "required": false
+        }
+      ],
+      "tags": ["gitlab", "git", "vcs", "ci-cd", "api"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/gitlab"
+    },
+    {
+      "name": "everything",
+      "description": "Reference server with prompts, resources, and tools for testing MCP clients",
+      "package": "@modelcontextprotocol/server-everything",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"],
+      "env": [],
+      "tags": ["testing", "reference", "demo", "development"],
+      "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/everything"
+    }
+  ]
+}
