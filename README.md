@@ -1,25 +1,48 @@
-# mcpx
+# mcpx — The Universal Package Manager for MCP Servers 🚀
 
-A package manager for MCP servers. Install, configure, and manage [Model Context Protocol](https://modelcontextprotocol.io/) servers across **Claude Desktop**, **Cursor**, and **Windsurf** with a single command — no manual JSON editing.
+[![PyPI version](https://img.shields.io/pypi/v/mcpx.svg)](https://pypi.org/project/mcpx/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/CharanBharathula/mcpx/actions/workflows/ci.yml/badge.svg)](https://github.com/CharanBharathula/mcpx/actions)
 
-```
+Stop editing `mcp_config.json` by hand. **mcpx** is a unified CLI to install, configure, and manage [Model Context Protocol](https://modelcontextprotocol.io/) servers across all major AI IDEs and desktops.
+
+```bash
 mcpx install github
 ```
 
-That one command installs the GitHub MCP server, prompts for your token, and writes the config into all three clients automatically.
+One command installs the server, prompts for required environment variables (like API tokens), and automatically syncs the configuration to **Claude Desktop**, **Cursor**, and **Windsurf**.
 
 ---
 
-## Install
+## ✨ Key Features
 
-**Requirements:** Python 3.9+, Node.js 18+ (for npx-based servers)
+- 🔄 **Multi-Client Sync**: Update configuration for all your AI tools at once.
+- 📦 **Built-in Registry**: Direct access to 30+ production-ready MCP servers.
+- 🛠️ **Zero Global Bloat**: Servers run via `npx` or virtual environments on-demand.
+- 🛡️ **Validated Configs**: No more syntax errors or broken paths in your JSON files.
+- 🔍 **Discovery**: Search and inspect server requirements before installing.
+
+---
+
+## 📦 Supported Clients
+
+| Client | Windows Path | macOS Path |
+| :--- | :--- | :--- |
+| **Claude Desktop** | `%APPDATA%\Claude\...` | `~/Library/Application Support/...` |
+| **Cursor** | `~/.cursor/mcp.json` | `~/.cursor/mcp.json` |
+| **Windsurf** | `~/.codeium/windsurf/...` | `~/.codeium/windsurf/...` |
+
+---
+
+## 🛠️ Installation
+
+**Requirements:** Python 3.9+, Node.js 18+ (for npx-based servers).
 
 ```bash
 pip install mcpx
 ```
 
-Or from source:
-
+### From Source
 ```bash
 git clone https://github.com/CharanBharathula/mcpx.git
 cd mcpx
@@ -28,130 +51,56 @@ pip install -e ".[dev]"
 
 ---
 
-## Commands
+## 📃 Command Reference
 
-| Command | Description |
-|---------|-------------|
-| `mcpx install <server>` | Install and configure an MCP server |
-| `mcpx uninstall <server>` | Remove an MCP server from all client configs |
-| `mcpx search [query]` | Search the server registry |
-| `mcpx info <server>` | Show details and required inputs for a server |
-| `mcpx list` | List installed servers for a client |
-| `mcpx clients` | Show supported clients and their config paths |
-| `mcpx run <server>` | Run a server directly for testing |
-| `mcpx update [server]` | Update server(s) to the latest version |
+| Command | Action |
+| :--- | :--- |
+| `mcpx install <server>` | Interactive installation & config injection |
+| `mcpx uninstall <server>` | Clean removal from all client configs |
+| `mcpx search <query>` | Search the community registry |
+| `mcpx list` | View all installed servers per client |
+| `mcpx run <server>` | Execute a server directly for testing |
+| `mcpx info <server>` | View required API keys and inputs |
+| `mcpx update` | Batch update all servers to latest versions |
 
-All commands support `--dry-run` to preview changes without applying them.
-
-### Options
-
-```
-mcpx install github --client claude          # install for one client only
-mcpx install github --client cursor --client windsurf
-mcpx --dry-run install filesystem            # preview without writing
-mcpx list --client cursor                    # list servers for Cursor
-```
+> **Pro Tip:** Use `--dry-run` with any command to see what changes would be made without writing to disk.
 
 ---
 
-## Registry — 31 servers
+## 📑 Integrated Registry (30+ Servers)
 
-### No configuration required
+**mcpx** comes pre-loaded with optimized configurations for:
 
-| Server | Description |
-|--------|-------------|
-| `memory` | Knowledge graph persistent memory |
-| `fetch` | Web content fetching and conversion |
-| `puppeteer` | Browser automation (Puppeteer) |
-| `playwright` | Browser automation (Playwright) |
-| `sequential-thinking` | Structured problem-solving |
-| `everything` | Reference/test server |
-| `docker` | Docker container management* |
-| `kubernetes` | Kubernetes cluster management* |
-| `azure` | Azure cloud management* |
-| `cloudflare` | Cloudflare Workers, KV, D1, R2* |
-| `git` | Git operations (requires uv) |
-| `time` | Time/timezone utilities (requires uv) |
+### 🔗 Standard (No Config)
+- `memory`: Knowledge graph persistent memory
+- `fetch`: Web content retrieval & markdown conversion
+- `playwright` / `puppeteer`: Full browser automation
+- `docker` / `kubernetes`: Infrastructure management
+- `sequential-thinking`: Structured reasoning
 
-*Requires prior auth setup — run `mcpx info <server>` for details.
+### 🔑 API-Powered (Requires Key)
+- `github` / `gitlab`: Repository & PR management
+- `brave-search` / `exa`: Real-time web search
+- `notion` / `slack` / `hubspot`: Workplace productivity
+- `stripe`: Financial operations
+- `sentry`: Error tracking & observability
 
-### Requires API key / token
-
-| Server | What you need |
-|--------|---------------|
-| `github` | GitHub Personal Access Token |
-| `gitlab` | GitLab Personal Access Token |
-| `brave-search` | Brave Search API key |
-| `google-maps` | Google Maps API key |
-| `slack` | Slack Bot Token |
-| `notion` | Notion Integration Token |
-| `hubspot` | HubSpot Private App Token |
-| `figma` | Figma Personal Access Token |
-| `exa` | Exa AI API key |
-| `stripe` | Stripe Secret Key |
-| `aws-kb-retrieval` | AWS credentials + region |
-| `atlassian` | Atlassian API token (Jira + Confluence) |
-| `mongodb` | MongoDB connection string |
-
-### Requires path input at install time
-
-| Server | What you need |
-|--------|---------------|
-| `filesystem` | Directory path to allow access |
-| `sqlite` | Path to SQLite database file |
-| `postgres` | PostgreSQL connection string |
-| `supabase` | Supabase personal access token |
-| `sentry` | Sentry auth token |
-| `obsidian` | Path to Obsidian vault |
+### 📁 File-System & DB
+- `filesystem`: Controlled directory access
+- `sqlite` / `postgres` / `mongodb`: Native database queries
 
 ---
 
-## How it works
+## 🤝 Contributing
 
-1. `mcpx install memory` — verifies Node.js is available
-2. Prompts for any required API keys or paths
-3. Writes the server config into:
-   - **Claude Desktop**: `%APPDATA%\Claude\claude_desktop_config.json` (Windows) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
-   - **Cursor**: `~/.cursor/mcp.json`
-   - **Windsurf**: `~/.codeium/windsurf/mcp_config.json`
-4. Restart your client — the server is ready
-
-Packages are **not** installed globally. `npx -y` downloads them on first use.
+We love new servers! To add a server to the registry:
+1. Fork the repo.
+2. Add your server definition to `mcpx/registry.json`.
+3. Add a test case in `tests/test_registry.py`.
+4. Submit a Pull Request.
 
 ---
 
-## Development
+## 📜 License
 
-```bash
-pip install -e ".[dev]"
-pytest -v        # 65 tests
-```
-
-### Project structure
-
-```
-mcpx/
-  cli.py          # Click commands
-  installer.py    # Runtime check + config builder
-  registry.py     # Registry loader + search
-  config.py       # Client config read/write
-  registry.json   # 31 bundled server definitions
-tests/
-  test_cli.py
-  test_config.py
-  test_installer.py
-  test_registry.py
-pyproject.toml
-```
-
----
-
-## Contributing
-
-Pull requests welcome. To add a new server, add an entry to `mcpx/registry.json` following the existing schema and add tests in `tests/test_registry.py`.
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE) for details.
