@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcpx"
+name = "mcp-ctl"
 version = "0.1.0"
 description = "A package manager for MCP servers — install, configure, and manage MCP servers across Claude Desktop, Cursor, and Windsurf"
 license = { text = "MIT" }
