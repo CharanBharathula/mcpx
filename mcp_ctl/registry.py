@@ -3,7 +3,7 @@ import urllib.request
 from pathlib import Path
 from typing import Dict, List, Optional
 
-MCP_CTL_DIR = Path.home() / ".mcp-ctl"
+MCP_CTL_DIR = Path.home() / ".mcp-stack"
 CUSTOM_REGISTRY_PATH = MCP_CTL_DIR / "registry.json"
 REGISTRY_UPDATE_URL = (
     "https://raw.githubusercontent.com/CharanBharathula/mcpx/main/mcp_ctl/registry.json"
@@ -52,13 +52,13 @@ class Registry:
 
     def fetch_remote(self, url: str) -> List[dict]:
         """Fetch and return servers list from a remote registry URL."""
-        req = urllib.request.Request(url, headers={"User-Agent": "mcp-ctl/0.1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "mcp-stack/0.1.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read())
         return data.get("servers", [])
 
     def save_custom(self, new_servers: List[dict]) -> int:
-        """Merge new_servers into ~/.mcp-ctl/registry.json. Returns count added/updated."""
+        """Merge new_servers into ~/.mcp-stack/registry.json. Returns count added/updated."""
         MCP_CTL_DIR.mkdir(parents=True, exist_ok=True)
         existing: Dict[str, dict] = {}
         if CUSTOM_REGISTRY_PATH.exists():
