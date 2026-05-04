@@ -314,7 +314,7 @@ def test_export_stdout(tmp_path, monkeypatch):
     result = runner.invoke(main, ["export", "--client", "claude"])
     assert result.exit_code == 0
     data = json.loads(result.output)
-    assert data["mcpx_export"] == "1.0.0"
+    assert data["mcp_ctl_export"] == "1.0.0"
     assert "memory" in data["servers"]
     assert data["source_client"] == "claude"
 

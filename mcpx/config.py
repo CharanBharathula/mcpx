@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-MCPX_DIR = Path.home() / ".mcpx"
+MCPX_DIR = Path.home() / ".mcp-ctl"
 
 
 class ConfigManager:
@@ -78,7 +78,7 @@ class ConfigManager:
     # ------------------------------------------------------------------
 
     def backup(self) -> Tuple[Path, List[str]]:
-        """Copy all existing client configs to ~/.mcpx/backups/<timestamp>/."""
+        """Copy all existing client configs to ~/.mcp-ctl/backups/<timestamp>/."""
         ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         backup_dir = MCPX_DIR / "backups" / ts
         backup_dir.mkdir(parents=True, exist_ok=True)

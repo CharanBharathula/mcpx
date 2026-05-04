@@ -35,10 +35,10 @@ def _load_profiles() -> dict:
 
 @click.group()
 @click.option("--dry-run", is_flag=True, default=False, help="Preview changes without applying them.")
-@click.version_option(version="0.1.0", prog_name="mcpx")
+@click.version_option(version="0.1.0", prog_name="mcp-ctl")
 @click.pass_context
 def main(ctx: click.Context, dry_run: bool) -> None:
-    """mcpx - A package manager for MCP servers.
+    """mcp-ctl - A package manager for MCP servers.
 
     Install, configure, and manage MCP servers across Claude Desktop,
     Cursor, and Windsurf with a single command.
@@ -72,7 +72,7 @@ def install(ctx: click.Context, server_name: str, clients: tuple) -> None:
 
     if not server:
         console.print(f"[red]Error:[/red] Server '{server_name}' not found in registry.")
-        console.print(f"Run [bold]mcpx search {server_name}[/bold] to find available servers.")
+        console.print(f"Run [bold]mcp-ctl search {server_name}[/bold] to find available servers.")
         sys.exit(1)
 
     console.print(
@@ -193,7 +193,7 @@ def search(query: str) -> None:
 
     console.print(table)
     console.print(
-        f"\n[dim]Found {len(results)} server(s). Use [bold]mcpx info <name>[/bold] for details.[/dim]"
+        f"\n[dim]Found {len(results)} server(s). Use [bold]mcp-ctl info <name>[/bold] for details.[/dim]"
     )
 
 
@@ -275,7 +275,7 @@ def list_servers(client: str) -> None:
         console.print(
             f"No MCP servers installed for [bold]{client_configs[client]['name']}[/bold]."
         )
-        console.print("Run [bold]mcpx install <server>[/bold] to get started.")
+        console.print("Run [bold]mcp-ctl install <server>[/bold] to get started.")
         return
 
     table = Table(
@@ -511,7 +511,7 @@ def doctor() -> None:
 
     console = _console()
 
-    table = Table(title="mcpx Doctor", show_header=True, header_style="bold blue")
+    table = Table(title="mcp-ctl Doctor", show_header=True, header_style="bold blue")
     table.add_column("Check", style="cyan", no_wrap=True)
     table.add_column("Status", no_wrap=True)
     table.add_column("Detail", style="dim")
@@ -605,7 +605,7 @@ def profile_list() -> None:
 
     console.print(table)
     console.print(
-        "\n[dim]Use [bold]mcpx profile install <name>[/bold] to install a profile.[/dim]"
+        "\n[dim]Use [bold]mcp-ctl profile install <name>[/bold] to install a profile.[/dim]"
     )
 
 
@@ -618,7 +618,7 @@ def profile_show(profile_name: str) -> None:
 
     if profile_name not in profiles:
         console.print(f"[red]Error:[/red] Profile '{profile_name}' not found.")
-        console.print("Run [bold]mcpx profile list[/bold] to see available profiles.")
+        console.print("Run [bold]mcp-ctl profile list[/bold] to see available profiles.")
         sys.exit(1)
 
     p = profiles[profile_name]
@@ -668,7 +668,7 @@ def profile_install(ctx: click.Context, profile_name: str, clients: tuple) -> No
 
     if profile_name not in profiles:
         console.print(f"[red]Error:[/red] Profile '{profile_name}' not found.")
-        console.print("Run [bold]mcpx profile list[/bold] to see available profiles.")
+        console.print("Run [bold]mcp-ctl profile list[/bold] to see available profiles.")
         sys.exit(1)
 
     p = profiles[profile_name]
@@ -703,7 +703,7 @@ def profile_install(ctx: click.Context, profile_name: str, clients: tuple) -> No
 @main.command()
 @click.option("--list", "show_list", is_flag=True, help="List available backups.")
 def backup(show_list: bool) -> None:
-    """Backup all client MCP configs to ~/.mcpx/backups/."""
+    """Backup all client MCP configs to ~/.mcp-ctl/backups/."""
     console = _console()
     config_manager = ConfigManager()
 
@@ -737,20 +737,20 @@ def backup(show_list: bool) -> None:
 @main.command()
 @click.argument("timestamp", required=False, default=None)
 def restore(timestamp: str | None) -> None:
-    """Restore client configs from a backup. Use 'mcpx backup --list' to see backups."""
+    """Restore client configs from a backup. Use 'mcp-ctl backup --list' to see backups."""
     console = _console()
     config_manager = ConfigManager()
     backups = config_manager.list_backups()
 
     if not backups:
-        console.print("[yellow]No backups found.[/yellow] Run [bold]mcpx backup[/bold] first.")
+        console.print("[yellow]No backups found.[/yellow] Run [bold]mcp-ctl backup[/bold] first.")
         return
 
     if timestamp:
         backup_dir = next((b for b in backups if b.name == timestamp), None)
         if not backup_dir:
             console.print(f"[red]Error:[/red] Backup '{timestamp}' not found.")
-            console.print("Run [bold]mcpx backup --list[/bold] to see available backups.")
+            console.print("Run [bold]mcp-ctl backup --list[/bold] to see available backups.")
             sys.exit(1)
     else:
         backup_dir = backups[0]
@@ -771,7 +771,7 @@ def restore(timestamp: str | None) -> None:
 
 @main.group("registry")
 def registry_group() -> None:
-    """Manage the mcpx server registry."""
+    """Manage the mcp-ctl server registry."""
     pass
 
 
@@ -786,7 +786,7 @@ def registry_update() -> None:
         servers = registry.fetch_remote(REGISTRY_UPDATE_URL)
         count = registry.save_custom(servers)
         console.print(f"[green]✓[/green] Registry updated: {count} server(s) loaded.")
-        console.print("[dim]Run [bold]mcpx search[/bold] to see all available servers.[/dim]")
+        console.print("[dim]Run [bold]mcp-ctl search[/bold] to see all available servers.[/dim]")
     except Exception as e:
         console.print(f"[red]Error:[/red] Failed to fetch registry: {e}")
         sys.exit(1)
@@ -844,7 +844,7 @@ def export(client: str, output: str | None) -> None:
         return
 
     export_data = {
-        "mcpx_export": "1.0.0",
+        "mcp_ctl_export": "1.0.0",
         "exported_at": datetime.now().isoformat(),
         "source_client": client,
         "servers": installed,

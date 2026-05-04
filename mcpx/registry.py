@@ -3,7 +3,7 @@ import urllib.request
 from pathlib import Path
 from typing import Dict, List, Optional
 
-MCPX_DIR = Path.home() / ".mcpx"
+MCPX_DIR = Path.home() / ".mcp-ctl"
 CUSTOM_REGISTRY_PATH = MCPX_DIR / "registry.json"
 REGISTRY_UPDATE_URL = (
     "https://raw.githubusercontent.com/CharanBharathula/mcpx/main/mcpx/registry.json"
@@ -58,7 +58,7 @@ class Registry:
         return data.get("servers", [])
 
     def save_custom(self, new_servers: List[dict]) -> int:
-        """Merge new_servers into ~/.mcpx/registry.json. Returns count added/updated."""
+        """Merge new_servers into ~/.mcp-ctl/registry.json. Returns count added/updated."""
         MCPX_DIR.mkdir(parents=True, exist_ok=True)
         existing: Dict[str, dict] = {}
         if CUSTOM_REGISTRY_PATH.exists():

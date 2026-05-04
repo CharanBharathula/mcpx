@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcpx = "mcpx.cli:main"
+mcp-ctl = "mcpx.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/CharanBharathula/mcpx"
