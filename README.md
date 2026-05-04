@@ -143,7 +143,7 @@ mcp-stack profile install dev
 
 We love new servers! To add one to the registry:
 1. Fork the repo.
-2. Add your server definition to `mcp_ctl/registry.json`.
+2. Add your server definition to `mcp_stack/registry.json`.
 3. Add a test in `tests/test_registry.py`.
 4. Submit a Pull Request.
 

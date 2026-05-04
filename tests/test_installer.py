@@ -1,6 +1,6 @@
 import pytest
 
-from mcp_ctl.installer import Installer
+from mcp_stack.installer import Installer
 
 
 def test_build_server_config_basic():

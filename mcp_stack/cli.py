@@ -844,7 +844,7 @@ def export(client: str, output: str | None) -> None:
         return
 
     export_data = {
-        "mcp_ctl_export": "1.0.0",
+        "mcp_stack_export": "1.0.0",
         "exported_at": datetime.now().isoformat(),
         "source_client": client,
         "servers": installed,

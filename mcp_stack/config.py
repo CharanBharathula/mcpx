@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-MCP_CTL_DIR = Path.home() / ".mcp-stack"
+MCP_STACK_DIR = Path.home() / ".mcp-stack"
 
 
 class ConfigManager:
@@ -80,7 +80,7 @@ class ConfigManager:
     def backup(self) -> Tuple[Path, List[str]]:
         """Copy all existing client configs to ~/.mcp-stack/backups/<timestamp>/."""
         ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        backup_dir = MCP_CTL_DIR / "backups" / ts
+        backup_dir = MCP_STACK_DIR / "backups" / ts
         backup_dir.mkdir(parents=True, exist_ok=True)
 
         backed_up: List[str] = []
@@ -94,7 +94,7 @@ class ConfigManager:
 
     def list_backups(self) -> List[Path]:
         """Return backup directories sorted newest-first."""
-        backups_dir = MCP_CTL_DIR / "backups"
+        backups_dir = MCP_STACK_DIR / "backups"
         if not backups_dir.exists():
             return []
         return sorted(

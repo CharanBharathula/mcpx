@@ -3,10 +3,10 @@ import urllib.request
 from pathlib import Path
 from typing import Dict, List, Optional
 
-MCP_CTL_DIR = Path.home() / ".mcp-stack"
-CUSTOM_REGISTRY_PATH = MCP_CTL_DIR / "registry.json"
+MCP_STACK_DIR = Path.home() / ".mcp-stack"
+CUSTOM_REGISTRY_PATH = MCP_STACK_DIR / "registry.json"
 REGISTRY_UPDATE_URL = (
-    "https://raw.githubusercontent.com/CharanBharathula/mcpx/main/mcp_ctl/registry.json"
+    "https://raw.githubusercontent.com/CharanBharathula/mcpx/main/mcp_stack/registry.json"
 )
 
 
@@ -59,7 +59,7 @@ class Registry:
 
     def save_custom(self, new_servers: List[dict]) -> int:
         """Merge new_servers into ~/.mcp-stack/registry.json. Returns count added/updated."""
-        MCP_CTL_DIR.mkdir(parents=True, exist_ok=True)
+        MCP_STACK_DIR.mkdir(parents=True, exist_ok=True)
         existing: Dict[str, dict] = {}
         if CUSTOM_REGISTRY_PATH.exists():
             try:

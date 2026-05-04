@@ -1,5 +1,5 @@
 import pytest
-from mcp_ctl.registry import Registry
+from mcp_stack.registry import Registry
 
 ORIGINAL_15 = [
     "github", "filesystem", "fetch", "memory", "postgres", "sqlite",
