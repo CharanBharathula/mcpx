@@ -35,7 +35,7 @@ def _load_profiles() -> dict:
 
 @click.group()
 @click.option("--dry-run", is_flag=True, default=False, help="Preview changes without applying them.")
-@click.version_option(version="0.1.0", prog_name="mcp-nest")
+@click.version_option(version="0.1.1", prog_name="mcp-nest")
 @click.pass_context
 def main(ctx: click.Context, dry_run: bool) -> None:
     """mcp-nest - A package manager for MCP servers.
