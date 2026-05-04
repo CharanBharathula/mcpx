@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcp-stack"
+name = "mcp-nest"
 version = "0.1.0"
 description = "A package manager for MCP servers — install, configure, and manage MCP servers across Claude Desktop, Cursor, and Windsurf"
 license = { text = "MIT" }
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcp-stack = "mcp_stack.cli:main"
+mcp-nest = "mcp_nest.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/CharanBharathula/mcpx"
@@ -26,7 +26,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["mcp_stack"]
+packages = ["mcp_nest"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

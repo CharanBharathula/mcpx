@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from mcp_stack.config import ConfigManager
+from mcp_nest.config import ConfigManager
 
 
 def test_get_client_configs_keys():

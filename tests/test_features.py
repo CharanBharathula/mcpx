@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from mcp_stack.cli import main
-from mcp_stack.config import ConfigManager
-from mcp_stack.registry import Registry
+from mcp_nest.cli import main
+from mcp_nest.config import ConfigManager
+from mcp_nest.registry import Registry
 
 
 # ---------------------------------------------------------------------------
@@ -18,7 +18,7 @@ from mcp_stack.registry import Registry
 
 def _patched_configs(tmp_path):
     """Return a monkeypatch helper that redirects all client config paths to tmp_path."""
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     original = cfg_module.ConfigManager.get_client_configs
 
@@ -53,7 +53,7 @@ def test_doctor_shows_client_config_status():
 
 
 def test_doctor_shows_installed_servers(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
 
@@ -68,7 +68,7 @@ def test_doctor_shows_installed_servers(tmp_path, monkeypatch):
 
 
 def test_doctor_flags_unknown_runtime(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
 
@@ -119,8 +119,8 @@ def test_profile_install_dry_run():
 
 def test_profile_install_no_config_servers(tmp_path, monkeypatch):
     """Install the devops profile — all servers need no API keys."""
-    from mcp_stack import config as cfg_module
-    from mcp_stack import installer as ins_module
+    from mcp_nest import config as cfg_module
+    from mcp_nest import installer as ins_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
     monkeypatch.setattr(ins_module.Installer, "check_runtime", lambda self, cmd: True)
@@ -141,11 +141,11 @@ def test_profile_install_no_config_servers(tmp_path, monkeypatch):
 
 
 def test_backup_creates_files(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
-    from mcp_stack.config import MCP_STACK_DIR
+    from mcp_nest import config as cfg_module
+    from mcp_nest.config import MCP_NEST_DIR
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
-    monkeypatch.setattr("mcp_stack.config.MCP_STACK_DIR", tmp_path / ".mcp-stack")
+    monkeypatch.setattr("mcp_nest.config.MCP_NEST_DIR", tmp_path / ".mcp-nest")
 
     cm = ConfigManager()
     configs = cm.get_client_configs()
@@ -158,7 +158,7 @@ def test_backup_creates_files(tmp_path, monkeypatch):
 
 
 def test_backup_list_empty(tmp_path, monkeypatch):
-    monkeypatch.setattr("mcp_stack.config.MCP_STACK_DIR", tmp_path / ".mcp-stack")
+    monkeypatch.setattr("mcp_nest.config.MCP_NEST_DIR", tmp_path / ".mcp-nest")
 
     runner = CliRunner()
     result = runner.invoke(main, ["backup", "--list"])
@@ -167,10 +167,10 @@ def test_backup_list_empty(tmp_path, monkeypatch):
 
 
 def test_backup_and_restore_roundtrip(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
-    monkeypatch.setattr("mcp_stack.config.MCP_STACK_DIR", tmp_path / ".mcp-stack")
+    monkeypatch.setattr("mcp_nest.config.MCP_NEST_DIR", tmp_path / ".mcp-nest")
 
     cm = ConfigManager()
     configs = cm.get_client_configs()
@@ -191,7 +191,7 @@ def test_backup_and_restore_roundtrip(tmp_path, monkeypatch):
 
 
 def test_restore_no_backups(tmp_path, monkeypatch):
-    monkeypatch.setattr("mcp_stack.config.MCP_STACK_DIR", tmp_path / ".mcp-stack")
+    monkeypatch.setattr("mcp_nest.config.MCP_NEST_DIR", tmp_path / ".mcp-nest")
 
     runner = CliRunner()
     result = runner.invoke(main, ["restore"])
@@ -205,8 +205,8 @@ def test_restore_no_backups(tmp_path, monkeypatch):
 
 
 def test_registry_update_mocked(tmp_path, monkeypatch):
-    monkeypatch.setattr("mcp_stack.registry.MCP_STACK_DIR", tmp_path / ".mcp-stack")
-    monkeypatch.setattr("mcp_stack.registry.CUSTOM_REGISTRY_PATH", tmp_path / ".mcp-stack" / "registry.json")
+    monkeypatch.setattr("mcp_nest.registry.MCP_NEST_DIR", tmp_path / ".mcp-nest")
+    monkeypatch.setattr("mcp_nest.registry.CUSTOM_REGISTRY_PATH", tmp_path / ".mcp-nest" / "registry.json")
 
     fake_servers = [
         {
@@ -224,7 +224,7 @@ def test_registry_update_mocked(tmp_path, monkeypatch):
     def fake_fetch(self, url):
         return fake_servers
 
-    from mcp_stack import registry as reg_module
+    from mcp_nest import registry as reg_module
     monkeypatch.setattr(reg_module.Registry, "fetch_remote", fake_fetch)
 
     runner = CliRunner()
@@ -234,8 +234,8 @@ def test_registry_update_mocked(tmp_path, monkeypatch):
 
 
 def test_registry_add_mocked(tmp_path, monkeypatch):
-    monkeypatch.setattr("mcp_stack.registry.MCP_STACK_DIR", tmp_path / ".mcp-stack")
-    monkeypatch.setattr("mcp_stack.registry.CUSTOM_REGISTRY_PATH", tmp_path / ".mcp-stack" / "registry.json")
+    monkeypatch.setattr("mcp_nest.registry.MCP_NEST_DIR", tmp_path / ".mcp-nest")
+    monkeypatch.setattr("mcp_nest.registry.CUSTOM_REGISTRY_PATH", tmp_path / ".mcp-nest" / "registry.json")
 
     fake_servers = [
         {
@@ -250,7 +250,7 @@ def test_registry_add_mocked(tmp_path, monkeypatch):
         }
     ]
 
-    from mcp_stack import registry as reg_module
+    from mcp_nest import registry as reg_module
     monkeypatch.setattr(reg_module.Registry, "fetch_remote", lambda self, url: fake_servers)
 
     runner = CliRunner()
@@ -260,8 +260,8 @@ def test_registry_add_mocked(tmp_path, monkeypatch):
 
 
 def test_registry_save_and_load_custom(tmp_path, monkeypatch):
-    monkeypatch.setattr("mcp_stack.registry.MCP_STACK_DIR", tmp_path / ".mcp-stack")
-    monkeypatch.setattr("mcp_stack.registry.CUSTOM_REGISTRY_PATH", tmp_path / ".mcp-stack" / "registry.json")
+    monkeypatch.setattr("mcp_nest.registry.MCP_NEST_DIR", tmp_path / ".mcp-nest")
+    monkeypatch.setattr("mcp_nest.registry.CUSTOM_REGISTRY_PATH", tmp_path / ".mcp-nest" / "registry.json")
 
     r = Registry()
     assert r.get_server("my-custom-srv") is None
@@ -283,7 +283,7 @@ def test_registry_save_and_load_custom(tmp_path, monkeypatch):
 
 
 def test_registry_add_empty_url(tmp_path, monkeypatch):
-    from mcp_stack import registry as reg_module
+    from mcp_nest import registry as reg_module
     monkeypatch.setattr(reg_module.Registry, "fetch_remote", lambda self, url: [])
 
     runner = CliRunner()
@@ -298,7 +298,7 @@ def test_registry_add_empty_url(tmp_path, monkeypatch):
 
 
 def test_export_stdout(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
 
@@ -314,13 +314,13 @@ def test_export_stdout(tmp_path, monkeypatch):
     result = runner.invoke(main, ["export", "--client", "claude"])
     assert result.exit_code == 0
     data = json.loads(result.output)
-    assert data["mcp_stack_export"] == "1.0.0"
+    assert data["mcp_nest_export"] == "1.0.0"
     assert "memory" in data["servers"]
     assert data["source_client"] == "claude"
 
 
 def test_export_to_file(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
 
@@ -343,7 +343,7 @@ def test_export_to_file(tmp_path, monkeypatch):
 
 
 def test_export_empty_client(tmp_path, monkeypatch):
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     monkeypatch.setattr(cfg_module.ConfigManager, "get_client_configs", _patched_configs(tmp_path))
 

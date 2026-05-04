@@ -3,10 +3,10 @@ import urllib.request
 from pathlib import Path
 from typing import Dict, List, Optional
 
-MCP_STACK_DIR = Path.home() / ".mcp-stack"
-CUSTOM_REGISTRY_PATH = MCP_STACK_DIR / "registry.json"
+MCP_NEST_DIR = Path.home() / ".mcp-nest"
+CUSTOM_REGISTRY_PATH = MCP_NEST_DIR / "registry.json"
 REGISTRY_UPDATE_URL = (
-    "https://raw.githubusercontent.com/CharanBharathula/mcpx/main/mcp_stack/registry.json"
+    "https://raw.githubusercontent.com/CharanBharathula/mcpx/main/mcp_nest/registry.json"
 )
 
 
@@ -52,14 +52,14 @@ class Registry:
 
     def fetch_remote(self, url: str) -> List[dict]:
         """Fetch and return servers list from a remote registry URL."""
-        req = urllib.request.Request(url, headers={"User-Agent": "mcp-stack/0.1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "mcp-nest/0.1.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read())
         return data.get("servers", [])
 
     def save_custom(self, new_servers: List[dict]) -> int:
-        """Merge new_servers into ~/.mcp-stack/registry.json. Returns count added/updated."""
-        MCP_STACK_DIR.mkdir(parents=True, exist_ok=True)
+        """Merge new_servers into ~/.mcp-nest/registry.json. Returns count added/updated."""
+        MCP_NEST_DIR.mkdir(parents=True, exist_ok=True)
         existing: Dict[str, dict] = {}
         if CUSTOM_REGISTRY_PATH.exists():
             try:

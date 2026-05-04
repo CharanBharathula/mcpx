@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 
-from mcp_stack.cli import main
+from mcp_nest.cli import main
 
 
 def test_search_command_with_query():
@@ -162,7 +162,7 @@ def test_install_unknown_server():
 def test_update_dry_run(tmp_path, monkeypatch):
     """--dry-run update with no installed servers should report nothing to update."""
     runner = CliRunner()
-    from mcp_stack import config as cfg_module
+    from mcp_nest import config as cfg_module
 
     original = cfg_module.ConfigManager.get_client_configs
 
@@ -196,8 +196,8 @@ def test_install_with_arg_prompt_input(tmp_path, monkeypatch):
     """install filesystem should prompt for allowed_dir and write it into args."""
     runner = CliRunner()
 
-    from mcp_stack import config as cfg_module
-    from mcp_stack import installer as ins_module
+    from mcp_nest import config as cfg_module
+    from mcp_nest import installer as ins_module
 
     original_cfg = cfg_module.ConfigManager.get_client_configs
 
@@ -227,8 +227,8 @@ def test_install_with_env_prompt_input(tmp_path, monkeypatch):
     """install github should prompt for token and store it in env."""
     runner = CliRunner()
 
-    from mcp_stack import config as cfg_module
-    from mcp_stack import installer as ins_module
+    from mcp_nest import config as cfg_module
+    from mcp_nest import installer as ins_module
 
     original_cfg = cfg_module.ConfigManager.get_client_configs
 
