@@ -4,33 +4,38 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/CharanBharathula/mcpx/actions/workflows/ci.yml/badge.svg)](https://github.com/CharanBharathula/mcpx/actions)
 
-Stop editing `mcp_config.json` by hand. **mcp-ctl** is a unified CLI to install, configure, and manage [Model Context Protocol](https://modelcontextprotocol.io/) servers across all major AI IDEs and desktops.
+Stop editing `mcp_config.json` by hand. **mcp-ctl** is a unified CLI to install, configure, and manage [Model Context Protocol](https://modelcontextprotocol.io/) servers across all major AI IDEs and desktops — with a single command.
 
 ```bash
+pip install mcp-ctl
 mcp-ctl install github
 ```
 
-One command installs the server, prompts for required environment variables (like API tokens), and automatically syncs the configuration to **Claude Desktop**, **Cursor**, and **Windsurf**.
+One command installs the server, prompts for required API tokens, and automatically writes the configuration to **Claude Desktop**, **Cursor**, and **Windsurf**.
 
 ---
 
 ## ✨ Key Features
 
-- 🔄 **Multi-Client Sync**: Update configuration for all your AI tools at once.
-- 📦 **Built-in Registry**: Direct access to 30+ production-ready MCP servers.
-- 🛠️ **Zero Global Bloat**: Servers run via `npx` or virtual environments on-demand.
-- 🛡️ **Validated Configs**: No more syntax errors or broken paths in your JSON files.
-- 🔍 **Discovery**: Search and inspect server requirements before installing.
+- 🔄 **Multi-Client Sync** — Configure all your AI tools at once
+- 📦 **Built-in Registry** — 31 production-ready MCP servers out of the box
+- 🛠️ **Zero Global Bloat** — Servers run via `npx`/`uvx` on-demand, nothing installed globally
+- 🛡️ **Validated Configs** — No more syntax errors or broken JSON files
+- 🔍 **Discovery** — Search and inspect server requirements before installing
+- 🩺 **Doctor** — Health check for runtimes, client configs, and installed servers
+- 🗂️ **Profiles** — Install curated server bundles in one command
+- 💾 **Backup & Restore** — Snapshot and recover all client configs
+- 📤 **Export** — Share your server setup as a portable JSON file
 
 ---
 
 ## 📦 Supported Clients
 
-| Client | Windows Path | macOS Path |
+| Client | Windows | macOS / Linux |
 | :--- | :--- | :--- |
-| **Claude Desktop** | `%APPDATA%\Claude\...` | `~/Library/Application Support/...` |
+| **Claude Desktop** | `%APPDATA%\Claude\claude_desktop_config.json` | `~/Library/Application Support/Claude/...` |
 | **Cursor** | `~/.cursor/mcp.json` | `~/.cursor/mcp.json` |
-| **Windsurf** | `~/.codeium/windsurf/...` | `~/.codeium/windsurf/...` |
+| **Windsurf** | `~/.codeium/windsurf/mcp_config.json` | `~/.codeium/windsurf/mcp_config.json` |
 
 ---
 
@@ -53,50 +58,93 @@ pip install -e ".[dev]"
 
 ## 📃 Command Reference
 
-| Command | Action |
-| :--- | :--- |
-| `mcp-ctl install <server>` | Interactive installation & config injection |
-| `mcp-ctl uninstall <server>` | Clean removal from all client configs |
-| `mcp-ctl search <query>` | Search the community registry |
-| `mcp-ctl list` | View all installed servers per client |
-| `mcp-ctl run <server>` | Execute a server directly for testing |
-| `mcp-ctl info <server>` | View required API keys and inputs |
-| `mcp-ctl update` | Batch update all servers to latest versions |
+### Core
 
-> **Pro Tip:** Use `--dry-run` with any command to see what changes would be made without writing to disk.
+| Command | Description |
+| :--- | :--- |
+| `mcp-ctl install <server>` | Install a server and write config to all clients |
+| `mcp-ctl uninstall <server>` | Remove a server from all client configs |
+| `mcp-ctl list` | List installed servers for a client |
+| `mcp-ctl search [query]` | Search the registry |
+| `mcp-ctl info <server>` | Show required inputs and details |
+| `mcp-ctl update [server]` | Update installed server(s) |
+| `mcp-ctl run <server>` | Run a server directly for testing |
+| `mcp-ctl clients` | Show supported clients and their config paths |
+
+### Profiles
+
+| Command | Description |
+| :--- | :--- |
+| `mcp-ctl profile list` | List all built-in profiles |
+| `mcp-ctl profile show <name>` | Show servers in a profile |
+| `mcp-ctl profile install <name>` | Install all servers in a profile |
+
+### Backup & Restore
+
+| Command | Description |
+| :--- | :--- |
+| `mcp-ctl backup` | Backup all client configs to `~/.mcp-ctl/backups/` |
+| `mcp-ctl backup --list` | List available backups |
+| `mcp-ctl restore [timestamp]` | Restore configs from a backup |
+
+### Registry
+
+| Command | Description |
+| :--- | :--- |
+| `mcp-ctl registry update` | Pull latest server list from GitHub |
+| `mcp-ctl registry add <url>` | Add servers from a custom registry URL |
+
+### Export
+
+| Command | Description |
+| :--- | :--- |
+| `mcp-ctl export --client claude` | Export installed servers as JSON |
+| `mcp-ctl export -o servers.json` | Save export to a file |
+
+> **Pro Tip:** Add `--dry-run` to any command to preview changes without writing to disk.
 
 ---
 
-## 📑 Integrated Registry (30+ Servers)
+## 🗂️ Built-in Profiles
 
-**mcp-ctl** comes pre-loaded with optimized configurations for:
+Install a full suite of servers in one command:
 
-### 🔗 Standard (No Config)
-- `memory`: Knowledge graph persistent memory
-- `fetch`: Web content retrieval & markdown conversion
-- `playwright` / `puppeteer`: Full browser automation
-- `docker` / `kubernetes`: Infrastructure management
-- `sequential-thinking`: Structured reasoning
+```bash
+mcp-ctl profile install dev
+```
 
-### 🔑 API-Powered (Requires Key)
-- `github` / `gitlab`: Repository & PR management
-- `brave-search` / `exa`: Real-time web search
-- `notion` / `slack` / `hubspot`: Workplace productivity
-- `stripe`: Financial operations
-- `sentry`: Error tracking & observability
+| Profile | Servers |
+| :--- | :--- |
+| `dev` | github, git, filesystem, docker, playwright |
+| `data` | postgres, sqlite, mongodb, memory |
+| `ai` | memory, sequential-thinking, fetch, exa, brave-search |
+| `devops` | docker, kubernetes, cloudflare, azure |
+| `writing` | notion, obsidian, memory, fetch |
+| `payments` | stripe, hubspot |
+| `search` | brave-search, exa, fetch, google-maps |
+| `fullstack` | github, supabase, postgres, playwright, figma |
 
-### 📁 File-System & DB
-- `filesystem`: Controlled directory access
-- `sqlite` / `postgres` / `mongodb`: Native database queries
+---
+
+## 📑 Integrated Registry (31 Servers)
+
+### 🔗 Standard (No Config Required)
+`memory` · `fetch` · `playwright` · `puppeteer` · `docker` · `kubernetes` · `sequential-thinking` · `git` · `time`
+
+### 🔑 API-Powered
+`github` · `gitlab` · `brave-search` · `exa` · `notion` · `slack` · `hubspot` · `stripe` · `sentry` · `atlassian` · `figma` · `google-maps` · `azure` · `cloudflare` · `aws-kb-retrieval`
+
+### 📁 File-System & Database
+`filesystem` · `sqlite` · `postgres` · `mongodb` · `obsidian` · `supabase`
 
 ---
 
 ## 🤝 Contributing
 
-We love new servers! To add a server to the registry:
+We love new servers! To add one to the registry:
 1. Fork the repo.
 2. Add your server definition to `mcp_ctl/registry.json`.
-3. Add a test case in `tests/test_registry.py`.
+3. Add a test in `tests/test_registry.py`.
 4. Submit a Pull Request.
 
 ---
