@@ -95,7 +95,7 @@ pip install -e ".[dev]"
 
 We love new servers! To add a server to the registry:
 1. Fork the repo.
-2. Add your server definition to `mcpx/registry.json`.
+2. Add your server definition to `mcp_ctl/registry.json`.
 3. Add a test case in `tests/test_registry.py`.
 4. Submit a Pull Request.
 

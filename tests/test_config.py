@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from mcpx.config import ConfigManager
+from mcp_ctl.config import ConfigManager
 
 
 def test_get_client_configs_keys():
