@@ -1,6 +1,10 @@
+import json
 import os
 import subprocess
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
 
 import click
 from rich.console import Console
@@ -9,7 +13,7 @@ from rich.table import Table
 
 from .config import ConfigManager
 from .installer import Installer
-from .registry import Registry
+from .registry import REGISTRY_UPDATE_URL, Registry
 
 _RUNTIME_INSTALL_HINTS = {
     "npx": "Node.js not found. Install from https://nodejs.org",
@@ -21,6 +25,12 @@ _RUNTIME_INSTALL_HINTS = {
 def _console() -> Console:
     """Return a Console writing to current sys.stdout (CliRunner-compatible)."""
     return Console(highlight=False)
+
+
+def _load_profiles() -> dict:
+    profiles_path = Path(__file__).parent / "profiles.json"
+    with open(profiles_path) as f:
+        return json.load(f)
 
 
 @click.group()
@@ -479,12 +489,373 @@ def update(ctx: click.Context, server_name: str | None, client: str) -> None:
                 else:
                     console.print(f"[red]Failed to update {name}:[/red] {result.stderr}")
         else:
-            # npx-based servers download the latest version automatically on each run
             if dry_run:
                 console.print(
                     f"[yellow][dry-run][/yellow] Would update: [bold]{package}[/bold] via npx"
                 )
             else:
                 console.print(
-                    f"[green]✓[/green] {name} uses npx - latest version is fetched automatically on each run."
+                    f"[green]✓[/green] {name} uses npx — latest version is fetched automatically on each run."
                 )
+
+
+# ---------------------------------------------------------------------------
+# doctor
+# ---------------------------------------------------------------------------
+
+
+@main.command()
+def doctor() -> None:
+    """Check system health: runtimes, client configs, and installed servers."""
+    import shutil as _shutil
+
+    console = _console()
+
+    table = Table(title="mcpx Doctor", show_header=True, header_style="bold blue")
+    table.add_column("Check", style="cyan", no_wrap=True)
+    table.add_column("Status", no_wrap=True)
+    table.add_column("Detail", style="dim")
+
+    all_ok = True
+
+    def _row(name: str, ok: bool, detail: str = "") -> None:
+        nonlocal all_ok
+        if not ok:
+            all_ok = False
+        status = "[green]✓ ok[/green]" if ok else "[red]✗ fail[/red]"
+        table.add_row(name, status, detail)
+
+    # --- Runtime checks ---
+    for runtime, label, hint in [
+        ("node", "Node.js", "install from https://nodejs.org"),
+        ("npx", "npx", "comes with Node.js"),
+        ("uvx", "uvx (uv)", "optional — needed for git/time servers; https://docs.astral.sh/uv/"),
+    ]:
+        path = _shutil.which(runtime)
+        if path:
+            try:
+                v = subprocess.run([runtime, "--version"], capture_output=True, text=True, timeout=5)
+                _row(label, True, v.stdout.strip() or v.stderr.strip())
+            except Exception:
+                _row(label, True, path)
+        else:
+            _row(label, runtime == "uvx", hint)  # uvx missing is a warning, not fatal
+
+    # --- Client config checks ---
+    config_manager = ConfigManager()
+    for client_id, client_info in config_manager.get_client_configs().items():
+        path = client_info["path"]
+        if not path.exists():
+            _row(f"{client_info['name']} config", True, "not found (created on first install)")
+            continue
+        try:
+            config_manager.read_config(path)
+            _row(f"{client_info['name']} config", True, str(path))
+        except Exception as e:
+            _row(f"{client_info['name']} config", False, f"invalid JSON: {e}")
+
+    # --- Installed server checks (Claude Desktop) ---
+    registry = Registry()
+    claude_path = config_manager.get_client_configs()["claude"]["path"]
+    installed = config_manager.get_installed_servers(claude_path)
+
+    for name, cfg in installed.items():
+        cmd = cfg.get("command", "npx")
+        runtime_ok = _shutil.which(cmd) is not None
+        in_registry = registry.get_server(name) is not None
+        ok = runtime_ok and in_registry
+        details = []
+        if not in_registry:
+            details.append("not in registry")
+        if not runtime_ok:
+            details.append(f"'{cmd}' not in PATH")
+        _row(f"server: {name}", ok, ", ".join(details) or f"via {cmd}")
+
+    console.print(table)
+    if all_ok:
+        console.print("\n[green]All checks passed.[/green]")
+    else:
+        console.print("\n[yellow]Some checks failed — see details above.[/yellow]")
+
+
+# ---------------------------------------------------------------------------
+# profile
+# ---------------------------------------------------------------------------
+
+
+@main.group()
+def profile() -> None:
+    """Manage server profiles — install curated sets of servers at once."""
+    pass
+
+
+@profile.command("list")
+def profile_list() -> None:
+    """List all available server profiles."""
+    console = _console()
+    profiles = _load_profiles()
+
+    table = Table(title="Available Profiles", show_header=True, header_style="bold blue")
+    table.add_column("Profile", style="cyan", no_wrap=True)
+    table.add_column("Description")
+    table.add_column("Servers", style="dim")
+
+    for name, info in profiles.items():
+        table.add_row(name, info["description"], ", ".join(info["servers"]))
+
+    console.print(table)
+    console.print(
+        "\n[dim]Use [bold]mcpx profile install <name>[/bold] to install a profile.[/dim]"
+    )
+
+
+@profile.command("show")
+@click.argument("profile_name")
+def profile_show(profile_name: str) -> None:
+    """Show servers included in a profile."""
+    console = _console()
+    profiles = _load_profiles()
+
+    if profile_name not in profiles:
+        console.print(f"[red]Error:[/red] Profile '{profile_name}' not found.")
+        console.print("Run [bold]mcpx profile list[/bold] to see available profiles.")
+        sys.exit(1)
+
+    p = profiles[profile_name]
+    registry = Registry()
+
+    console.print(
+        Panel(
+            f"[bold]{profile_name}[/bold]\n{p['description']}",
+            title="Profile",
+            border_style="blue",
+        )
+    )
+
+    table = Table(show_header=True, header_style="bold blue")
+    table.add_column("Server", style="cyan")
+    table.add_column("Description")
+    table.add_column("Required inputs", style="dim")
+
+    for server_name in p["servers"]:
+        server = registry.get_server(server_name)
+        if server:
+            required = [e["name"] for e in server.get("env", []) if e.get("required")]
+            required += [ap["name"] for ap in server.get("arg_prompts", []) if ap.get("required")]
+            table.add_row(
+                server_name,
+                server["description"],
+                ", ".join(required) if required else "[dim]none[/dim]",
+            )
+
+    console.print(table)
+
+
+@profile.command("install")
+@click.argument("profile_name")
+@click.option(
+    "--client",
+    "clients",
+    multiple=True,
+    type=click.Choice(["claude", "cursor", "windsurf"]),
+    help="Target specific client(s). Defaults to all.",
+)
+@click.pass_context
+def profile_install(ctx: click.Context, profile_name: str, clients: tuple) -> None:
+    """Install all servers in a profile."""
+    console = _console()
+    profiles = _load_profiles()
+
+    if profile_name not in profiles:
+        console.print(f"[red]Error:[/red] Profile '{profile_name}' not found.")
+        console.print("Run [bold]mcpx profile list[/bold] to see available profiles.")
+        sys.exit(1)
+
+    p = profiles[profile_name]
+    console.print(
+        Panel(
+            f"[bold]{profile_name}[/bold] — {p['description']}\n"
+            f"Servers: {', '.join(p['servers'])}",
+            title="Installing Profile",
+            border_style="blue",
+        )
+    )
+
+    failed = []
+    for server_name in p["servers"]:
+        console.print(f"\n[cyan]→[/cyan] Installing [bold]{server_name}[/bold]...")
+        try:
+            ctx.invoke(install, server_name=server_name, clients=clients)
+        except SystemExit:
+            failed.append(server_name)
+            console.print(f"  [yellow]Skipped {server_name}.[/yellow]")
+
+    console.print(f"\n[green]✓[/green] Profile [bold]{profile_name}[/bold] complete.")
+    if failed:
+        console.print(f"  [yellow]Skipped:[/yellow] {', '.join(failed)}")
+
+
+# ---------------------------------------------------------------------------
+# backup
+# ---------------------------------------------------------------------------
+
+
+@main.command()
+@click.option("--list", "show_list", is_flag=True, help="List available backups.")
+def backup(show_list: bool) -> None:
+    """Backup all client MCP configs to ~/.mcpx/backups/."""
+    console = _console()
+    config_manager = ConfigManager()
+
+    if show_list:
+        backups = config_manager.list_backups()
+        if not backups:
+            console.print("[dim]No backups found.[/dim]")
+            return
+        table = Table(title="Available Backups", show_header=True, header_style="bold blue")
+        table.add_column("Timestamp", style="cyan")
+        table.add_column("Path", style="dim")
+        for b in backups:
+            table.add_row(b.name, str(b))
+        console.print(table)
+        return
+
+    backup_dir, backed_up = config_manager.backup()
+    if not backed_up:
+        console.print("[yellow]No config files found to back up.[/yellow]")
+        return
+
+    console.print(f"[green]✓[/green] Backed up: {', '.join(backed_up)}")
+    console.print(f"  Saved to: [dim]{backup_dir}[/dim]")
+
+
+# ---------------------------------------------------------------------------
+# restore
+# ---------------------------------------------------------------------------
+
+
+@main.command()
+@click.argument("timestamp", required=False, default=None)
+def restore(timestamp: str | None) -> None:
+    """Restore client configs from a backup. Use 'mcpx backup --list' to see backups."""
+    console = _console()
+    config_manager = ConfigManager()
+    backups = config_manager.list_backups()
+
+    if not backups:
+        console.print("[yellow]No backups found.[/yellow] Run [bold]mcpx backup[/bold] first.")
+        return
+
+    if timestamp:
+        backup_dir = next((b for b in backups if b.name == timestamp), None)
+        if not backup_dir:
+            console.print(f"[red]Error:[/red] Backup '{timestamp}' not found.")
+            console.print("Run [bold]mcpx backup --list[/bold] to see available backups.")
+            sys.exit(1)
+    else:
+        backup_dir = backups[0]
+        console.print(f"[dim]Using latest backup: {backup_dir.name}[/dim]")
+
+    restored = config_manager.restore(backup_dir)
+    if restored:
+        console.print(f"[green]✓[/green] Restored: {', '.join(restored)}")
+        console.print("[dim]Restart your client(s) to load the restored config.[/dim]")
+    else:
+        console.print("[yellow]No configs were restored from that backup.[/yellow]")
+
+
+# ---------------------------------------------------------------------------
+# registry (group)
+# ---------------------------------------------------------------------------
+
+
+@main.group("registry")
+def registry_group() -> None:
+    """Manage the mcpx server registry."""
+    pass
+
+
+@registry_group.command("update")
+def registry_update() -> None:
+    """Fetch the latest server list from GitHub and update the local registry."""
+    console = _console()
+    registry = Registry()
+
+    console.print("[dim]Fetching registry from GitHub...[/dim]")
+    try:
+        servers = registry.fetch_remote(REGISTRY_UPDATE_URL)
+        count = registry.save_custom(servers)
+        console.print(f"[green]✓[/green] Registry updated: {count} server(s) loaded.")
+        console.print("[dim]Run [bold]mcpx search[/bold] to see all available servers.[/dim]")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] Failed to fetch registry: {e}")
+        sys.exit(1)
+
+
+@registry_group.command("add")
+@click.argument("url")
+def registry_add(url: str) -> None:
+    """Add servers from a custom registry URL."""
+    console = _console()
+    registry = Registry()
+
+    console.print(f"[dim]Fetching registry from {url}...[/dim]")
+    try:
+        servers = registry.fetch_remote(url)
+        if not servers:
+            console.print("[yellow]No servers found at that URL.[/yellow]")
+            return
+        count = registry.save_custom(servers)
+        console.print(f"[green]✓[/green] Added {count} server(s) to local registry:")
+        for s in servers:
+            console.print(f"  • [cyan]{s['name']}[/cyan] — {s.get('description', '')}")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] Failed to fetch registry: {e}")
+        sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# export
+# ---------------------------------------------------------------------------
+
+
+@main.command()
+@click.option(
+    "--client",
+    default="claude",
+    type=click.Choice(["claude", "cursor", "windsurf"]),
+    show_default=True,
+    help="Which client to export servers from.",
+)
+@click.option("--output", "-o", default=None, help="Output file path (default: print to stdout).")
+def export(client: str, output: str | None) -> None:
+    """Export installed MCP servers as a shareable JSON file."""
+    console = _console()
+    config_manager = ConfigManager()
+    client_configs = config_manager.get_client_configs()
+
+    config_path = client_configs[client]["path"]
+    installed = config_manager.get_installed_servers(config_path)
+
+    if not installed:
+        console.print(
+            f"[yellow]No servers installed for {client_configs[client]['name']}.[/yellow]"
+        )
+        return
+
+    export_data = {
+        "mcpx_export": "1.0.0",
+        "exported_at": datetime.now().isoformat(),
+        "source_client": client,
+        "servers": installed,
+    }
+
+    export_json = json.dumps(export_data, indent=2)
+
+    if output:
+        Path(output).write_text(export_json)
+        console.print(
+            f"[green]✓[/green] Exported {len(installed)} server(s) to [bold]{output}[/bold]"
+        )
+    else:
+        print(export_json)

@@ -1,0 +1,34 @@
+{
+  "dev": {
+    "description": "Essential developer tools — GitHub, Git, filesystem, Docker, Playwright",
+    "servers": ["github", "git", "filesystem", "docker", "playwright"]
+  },
+  "data": {
+    "description": "Database and data analysis — Postgres, SQLite, MongoDB, Memory",
+    "servers": ["postgres", "sqlite", "mongodb", "memory"]
+  },
+  "ai": {
+    "description": "AI research and reasoning — memory, thinking, search, fetch",
+    "servers": ["memory", "sequential-thinking", "fetch", "exa", "brave-search"]
+  },
+  "devops": {
+    "description": "Infrastructure and deployment — Docker, Kubernetes, Cloudflare, Azure",
+    "servers": ["docker", "kubernetes", "cloudflare", "azure"]
+  },
+  "writing": {
+    "description": "Knowledge management and writing — Notion, Obsidian, Memory, Fetch",
+    "servers": ["notion", "obsidian", "memory", "fetch"]
+  },
+  "payments": {
+    "description": "Payments and CRM — Stripe, HubSpot",
+    "servers": ["stripe", "hubspot"]
+  },
+  "search": {
+    "description": "Web search and retrieval — Brave, Exa, Fetch, Google Maps",
+    "servers": ["brave-search", "exa", "fetch", "google-maps"]
+  },
+  "fullstack": {
+    "description": "Full-stack development — GitHub, Supabase, Postgres, Playwright, Figma",
+    "servers": ["github", "supabase", "postgres", "playwright", "figma"]
+  }
+}
